@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.ArtAttachMapper">
+
+	<insert id="insert">
+	insert into tbl_attach (uploadpath, filename, filetype, ano)
+	values (#{uploadPath}, #{fileName}, #{fileType}, #{ano} )
+	
+<!-- 	insert into tbl_art (image)
+	values (#{fileName}) -->
+	</insert>
+	
+	<delete id="delete">
+	delete from tbl_attach where filename = #{filename}
+	</delete>
+	
+	<select id="findByAno" resultType="org.zerock.domain.ArtAttachVO">
+	select * from tbl_attach where ano = #{ano}
+	</select>
+	
+	<delete id="deleteAll">
+	delete tbl_attach where ano=#{ano}
+	</delete>
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.ArtMapper">
+	
+
+    <select id="getList" resultType="org.zerock.domain.ArtVO">
+		<![CDATA[
+			select * from tbl_art where ano > 0 
+			]]>
+	</select>
+	
+	<insert id="insert">
+		insert into tbl_art (ano,aname,artist,gno,gname,menu,image,content)
+		values (seq_art.nextval, #{aname},#{artist},#{gno},#{gname},#{menu},#{image},#{content})
+	</insert>
+
+	<insert id="insertSelectKey">
+
+		<selectKey keyProperty="ano" order="BEFORE"	resultType="long">
+			select seq_art.nextval from dual
+		</selectKey>
+
+		insert into tbl_art (ano,aname,artist,gno,gname,menu,image,content)
+		values (#{ano}, #{aname},#{artist},#{gno},#{gname},#{menu},#{image},#{content})
+	</insert>
+	
+	<select id="read" resultType="org.zerock.domain.ArtVO">
+		select * from tbl_art where ano =	#{ano}
+	</select>
+
+	<delete id="delete">
+		delete tbl_art where ano = #{ano}
+	</delete>
+
+	<update id="update">
+		update tbl_art
+		set aname= #{aname},
+		artist=#{artist},
+		gno= #{gno},
+		gname= #{gname},
+		menu=#{menu},
+		image=#{image},
+		content=#{content}
+		where ano =	#{ano}
+	</update>
+	
+	<sql id="criteria">
+	 <trim prefix="(" suffix=") AND" prefixOverrides="OR">
+		 	<foreach item = 'type' collection="typeArr">
+		 		<trim prefix="OR">
+		 			<choose>
+		 				<when test="type == 'T'.toString()">
+		 					aname like '%'||#{keyword}||'%'
+		 				</when>
+		 				<when test="type == 'C'.toString()">
+		 					artist like '%'||#{keyword}||'%'
+		 				</when>
+		 				<when test="type == 'W'.toString()">
+		 					menu like '%'||#{keyword}||'%'
+		 				</when>
+		 				
+		 			</choose>
+		 		</trim>
+		 	</foreach>
+		 </trim>
+		
+	</sql>
+	
+	<select id="getListWithPaging" resultType="org.zerock.domain.ArtVO">
+		<![CDATA[
+			select
+				ano,aname,artist,gno,gname,image,menu,content
+			from
+				(
+				select/*+INDEX_DESC(tbl_art pk_art)*/
+					rownum rn,ano,aname,artist,gno,gname,image,menu,content
+				from 
+					tbl_art
+			where
+			]]>
+			
+			<include refid="criteria"></include>
+		
+		 <![CDATA[
+			 rownum <=#{pageNum}*#{amount}
+				)
+		where rn > (#{pageNum}-1)*#{amount} 
+		]]>
+		
+	</select>
+	
+	<select id ="getTotalCount" resultType="int">
+		select count(*) from tbl_art 
+		where 
+		
+		<include refid="criteria"></include>
+		
+		ano > 0
+	</select>
+	
+<!-- <select id="getOldFiles" resultType="org.zerock.domain.ArtVO">
+	select *from tbl_art where image =
+</select>	 -->
+	
+	
+</mapper>
